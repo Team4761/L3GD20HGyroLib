@@ -1,6 +1,5 @@
 package org.robockets.lib;
 
-
 import edu.wpi.first.wpilibj.I2C;
 
 /**
@@ -9,6 +8,9 @@ import edu.wpi.first.wpilibj.I2C;
  */
 public class AdaGyro {
 
+    /**
+     * The gyro
+     */
     private I2C gyro;
 
     /**
@@ -90,7 +92,6 @@ public class AdaGyro {
         return overflow;
     }
 
-
     /**
      * Read temperature values
      * @return The temperature read from the gyro
@@ -108,10 +109,16 @@ public class AdaGyro {
      * @return The X value
      */
     public double readX() {
-        byte[] overflow = new byte[1];
+        byte[] hOrder = new byte[1];
+        byte[] lOrder = new byte[1];
         double x = 0;
 
         // Stuff goes here
+
+        gyro.read(0x28, 1, hOrder);
+        gyro.read(0x29, 1, lOrder);
+
+        x = getDegrees(hOrder[0], lOrder[0]);
 
         return x;
     }
@@ -121,10 +128,14 @@ public class AdaGyro {
      * @return The Y value
      */
     public double readY() {
-        byte[] overflow = new byte[1];
+        byte[] hOrder = new byte[1];
+        byte[] lOrder = new byte[1];
         double y = 0;
 
-        // Stuff goes here
+        gyro.read(0x2A, 1, hOrder);
+        gyro.read(0x2B, 1, lOrder);
+
+        y = getDegrees(hOrder[0], lOrder[0]);
 
         return y;
     }
@@ -134,10 +145,16 @@ public class AdaGyro {
      * @return The Z Value
      */
     public double readZ() {
-        byte[] overflow = new byte[1];
+        byte[] hOrder = new byte[1];
+        byte[] lOrder = new byte[1];
         double z = 0;
 
         // Stuff goes here
+
+        gyro.read(0x2C, 1, hOrder);
+        gyro.read(0x2D, 1, lOrder);
+
+        z = getDegrees(hOrder[0], lOrder[0]);
 
         return z;
     }
@@ -190,4 +207,35 @@ public class AdaGyro {
         return overflow;
     }
 
+    /**
+     * Convert a unsigned byte to an integer
+     * @param number The unsigned byte to convert
+     * @return The integer from the unsigned byte
+     */
+    private int uByteToInt (byte number) {
+        int iNumber = number & 0b01111111;
+
+        if (number < 0) {
+            iNumber += 128;
+        }
+
+        return iNumber;
+    }
+
+    /**
+     * Get the degrees from the high and low order bytes
+     * @param highOrderByte The high order byte from the gyro
+     * @param lowOrderByte The low order byte from the gyro
+     * @return The angle in degrees from the high and low order bytes
+     */
+    private double getDegrees(byte highOrderByte, byte lowOrderByte) {
+
+        int highOrder = uByteToInt(highOrderByte);
+        int lowOrder = uByteToInt(lowOrderByte);
+
+        int rotation = ((highOrder << 8) + lowOrder) / 1000;
+
+        double degrees = -(rotation / 131.0);
+        return degrees;
+    }
 }
