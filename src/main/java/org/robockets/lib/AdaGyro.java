@@ -15,7 +15,7 @@ public class AdaGyro {
 
     /**
      * Create the I2C object based on the address provided
-     * @param address The device adress in hex either 0x6A or 0x6B
+     * @param address The device address in hex either 0x6A or 0x6B
      */
     public AdaGyro(int address) {
         gyro = new I2C(I2C.Port.kOnboard, address);
