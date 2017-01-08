@@ -111,16 +111,16 @@ public class AdaGyro {
     public double readX() {
         byte[] hOrder = new byte[1];
         byte[] lOrder = new byte[1];
-        double x = 0;
+        int x = 0;
 
         // Stuff goes here
 
-        gyro.read(0x28, 1, hOrder);
-        gyro.read(0x29, 1, lOrder);
+        gyro.read(0x28, 1, lOrder);
+        gyro.read(0x29, 1, hOrder);
 
         x = getDegrees(hOrder[0], lOrder[0]);
 
-        return x;
+        return toUnsigned(x);
     }
 
     /**
@@ -130,14 +130,14 @@ public class AdaGyro {
     public double readY() {
         byte[] hOrder = new byte[1];
         byte[] lOrder = new byte[1];
-        double y = 0;
+        int y = 0;
 
-        gyro.read(0x2A, 1, hOrder);
-        gyro.read(0x2B, 1, lOrder);
+        gyro.read(0x2A, 1, lOrder);
+        gyro.read(0x2B, 1, hOrder);
 
         y = getDegrees(hOrder[0], lOrder[0]);
 
-        return y;
+        return toUnsigned(y);
     }
 
     /**
@@ -147,16 +147,16 @@ public class AdaGyro {
     public double readZ() {
         byte[] hOrder = new byte[1];
         byte[] lOrder = new byte[1];
-        double z = 0;
+        int z = 0;
 
         // Stuff goes here
 
-        gyro.read(0x2C, 1, hOrder);
-        gyro.read(0x2D, 1, lOrder);
+        gyro.read(0x2C, 1, lOrder);
+        gyro.read(0x2D, 1, hOrder);
 
         z = getDegrees(hOrder[0], lOrder[0]);
 
-        return z;
+        return toUnsigned(z);
     }
 
     /**
@@ -228,14 +228,19 @@ public class AdaGyro {
      * @param lowOrderByte The low order byte from the gyro
      * @return The angle in degrees from the high and low order bytes
      */
-    private double getDegrees(byte highOrderByte, byte lowOrderByte) {
+    private int getDegrees(byte highOrderByte, byte lowOrderByte) {
 
-        int highOrder = uByteToInt(highOrderByte);
-        int lowOrder = uByteToInt(lowOrderByte);
+        int rotation = ((highOrderByte << 8) | lowOrderByte);
 
-        int rotation = ((highOrder << 8) + lowOrder) / 1000;
+        return rotation;
+    }
 
-        double degrees = -(rotation / 131.0);
-        return degrees;
+    /**
+     * Convert signed byte to unsigned
+     * @param signed The signed byte you want to convert
+     * @return The unsigned byte
+     */
+    public int toUnsigned(int signed) {
+        return signed & 0xFF;
     }
 }
