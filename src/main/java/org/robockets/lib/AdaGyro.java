@@ -118,7 +118,7 @@ public class AdaGyro {
         gyro.read(0x28, 1, lOrder);
         gyro.read(0x29, 1, hOrder);
 
-        x = getDegrees(hOrder[0], lOrder[0]);
+        x = getDegrees(lOrder[0], hOrder[0]);
 
         return toUnsigned(x);
     }
@@ -135,7 +135,7 @@ public class AdaGyro {
         gyro.read(0x2A, 1, lOrder);
         gyro.read(0x2B, 1, hOrder);
 
-        y = getDegrees(hOrder[0], lOrder[0]);
+        y = getDegrees(lOrder[0], hOrder[0]);
 
         return toUnsigned(y);
     }
@@ -154,7 +154,7 @@ public class AdaGyro {
         gyro.read(0x2C, 1, lOrder);
         gyro.read(0x2D, 1, hOrder);
 
-        z = getDegrees(hOrder[0], lOrder[0]);
+        z = getDegrees(lOrder[0], hOrder[0]);
 
         return toUnsigned(z);
     }
