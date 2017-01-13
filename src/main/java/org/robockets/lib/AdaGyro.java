@@ -11,7 +11,17 @@ public class AdaGyro {
     /**
      * The gyro
      */
-    private I2C gyro;
+    static I2C gyro;
+
+    /**
+     * Thread used for updater
+     */
+    private Thread thread;
+
+    // These are package private so that Updater can read them
+    static int accumX;
+    static int accumY;
+    static int accumZ;
 
     /**
      * Create the I2C object based on the address provided
@@ -19,6 +29,9 @@ public class AdaGyro {
      */
     public AdaGyro(int address) {
         gyro = new I2C(I2C.Port.kOnboard, address);
+        accumX = 0;
+        accumY = 0;
+        accumZ = 0;
     }
 
     /**
@@ -109,18 +122,7 @@ public class AdaGyro {
      * @return The X value
      */
     public double readX() {
-        byte[] hOrder = new byte[1];
-        byte[] lOrder = new byte[1];
-        int x = 0;
-
-        // Stuff goes here
-
-        gyro.read(0x28, 1, lOrder);
-        gyro.read(0x29, 1, hOrder);
-
-        x = getDegrees(lOrder[0], hOrder[0]);
-
-        return toUnsigned(x);
+        return accumX;
     }
 
     /**
@@ -128,16 +130,7 @@ public class AdaGyro {
      * @return The Y value
      */
     public double readY() {
-        byte[] hOrder = new byte[1];
-        byte[] lOrder = new byte[1];
-        int y = 0;
-
-        gyro.read(0x2A, 1, lOrder);
-        gyro.read(0x2B, 1, hOrder);
-
-        y = getDegrees(lOrder[0], hOrder[0]);
-
-        return toUnsigned(y);
+        return accumY;
     }
 
     /**
@@ -145,18 +138,7 @@ public class AdaGyro {
      * @return The Z Value
      */
     public double readZ() {
-        byte[] hOrder = new byte[1];
-        byte[] lOrder = new byte[1];
-        int z = 0;
-
-        // Stuff goes here
-
-        gyro.read(0x2C, 1, lOrder);
-        gyro.read(0x2D, 1, hOrder);
-
-        z = getDegrees(lOrder[0], hOrder[0]);
-
-        return toUnsigned(z);
+       return accumZ;
     }
 
     /**
@@ -228,7 +210,7 @@ public class AdaGyro {
      * @param lowOrderByte The low order byte from the gyro
      * @return The angle in degrees from the high and low order bytes
      */
-    private int getDegrees(byte highOrderByte, byte lowOrderByte) {
+    public static int getDegrees(byte highOrderByte, byte lowOrderByte) {
 
         int rotation = ((highOrderByte << 8) | lowOrderByte);
 
